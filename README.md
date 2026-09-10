@@ -60,46 +60,43 @@ no sirve para entrar como maestra.
 
 En el paso 1 (elegir tema) hay dos botones:
 
-1. **Bajar plantilla** — te da un archivo que ya viene con ejemplos y las
-   columnas correctas.
+1. **Bajar plantilla** — te da un archivo con ejemplos y las columnas en orden.
 2. Lo abrís en Excel, borrás los ejemplos y escribís tus preguntas.
-3. **Subir mi archivo** — y los temas nuevos aparecen al instante.
+3. Guardás como CSV **con el nombre del tema** (`Fracciones.csv` → tema *Fracciones*)
+   y **Subir mi archivo**. El tema aparece al instante.
 
-Las columnas son:
+Una fila por pregunta, seis columnas, sin nada más:
 
-| Columna | ¿Obligatoria? | Qué va |
-|:--|:--|:--|
-| `categoria` | no | Para agrupar: Matemáticas, Lenguaje… |
-| `tema` | **sí** | El nombre de la tarjeta que elegís |
-| `grado` | no | "3.º–4.º" |
-| `simbolo` | no | Un carácter para el ícono: `+`, `×`, `½` |
-| `pregunta` | **sí** | El enunciado |
-| `A` `B` `C` `D` | **A y B sí** | Las opciones (vacías si es abierta) |
-| `correcta` | **sí** | La letra: `A`, `B`, `C` o `D` — o `abierta` |
-| `distractor` | no | La letra del **error más común** |
-| `porque` | no | La explicación que se lee al revelar |
-| `error` | no | "eligieron 41: olvidaron llevar la decena." |
+| Columna | Qué va |
+|:--|:--|
+| 1 | El número de la pregunta (1, 2, 3…) |
+| 2 | La pregunta |
+| 3 | **La respuesta correcta** |
+| 4, 5, 6 | Las otras respuestas (podés dejar una o dos vacías) |
 
-Las últimas tres son las que hacen que TutorBox detecte los errores que se
-repiten. Sin ellas funciona igual, pero no te avisa de nada.
+```
+1;¿Cuánto es 24 + 18?;42;32;41;46
+2;¿Cuál palabra lleva tilde?;árbol;papel;reloj;
+3;Escribí con tus palabras qué aprendiste hoy.;;;;
+```
+
+La correcta siempre va en la columna 3: TutorBox las baraja al importar, así no
+cae siempre en la A. Si la primera fila es un encabezado, se salta sola.
 
 ### Preguntas de respuesta abierta
 
-Para que los niños **escriban** la respuesta en vez de elegir una letra, dejá
-`A` `B` `C` `D` vacías y escribí `abierta` en la columna `correcta`:
+Dejá **las cuatro respuestas vacías** (fila 3 del ejemplo). En el celular aparece
+una caja de texto (hasta 200 letras) en vez de las opciones. Mientras contestan,
+vos ves en tu panel quién ya escribió y **qué escribió cada uno**. Estas preguntas
+**no dan puntos** — no hay respuesta correcta que comparar — así que no entran en
+el promedio ni en la clasificación. Al terminar el juego, el botón *Descargar
+respuestas escritas* baja un CSV con una fila por alumno y pregunta.
 
-```
-Lenguaje;Escritura;3.o-4.o;E;Escribi que aprendiste hoy.;;;;;abierta;;;
-```
+Si una fila tiene un problema (una sola respuesta, sin pregunta), **se importan
+todas las demás** y te dice cuáles saltó. No perdés 40 preguntas por un typo.
 
-En el celular aparece una caja de texto (hasta 200 letras). Mientras contestan,
-vos ves en tu panel quién ya escribió y **qué escribió cada uno**. Estas
-preguntas **no dan puntos** — no hay respuesta correcta que comparar — así que
-no entran en el promedio ni en la clasificación. Al terminar el juego, el botón
-*Descargar respuestas escritas* baja un CSV con una fila por alumno y pregunta.
-
-Si una fila tiene un problema, **se importan todas las demás** y te dice cuáles
-saltó. No perdés 40 preguntas por un typo.
+Los avisos de "más de la mitad eligió el mismo error" y la explicación por voz
+sólo existen en los temas que trae TutorBox: el archivo simple no los lleva.
 
 ---
 
@@ -160,7 +157,7 @@ Ver qué está pasando: `sudo journalctl -u tutorbox -f`
   usar audios grabados.
 - **K'iche':** no existe voz sintética de k'iche' en ningún sistema. La única
   forma es **grabar los audios**. Se ponen en `public/audio/` y se nombran en las
-  columnas `audio_es` / `audio_quc` del CSV. Si una pregunta no tiene audio en
+  campos `audio_es` / `audio_quc` del banco (`banks/*.json`). Si una pregunta no tiene audio en
   k'iche', el botón no aparece.
 
 ## Notas técnicas

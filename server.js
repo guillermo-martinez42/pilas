@@ -218,7 +218,7 @@ app.get('/api/host/plantilla.csv', (_req, res) => {
 });
 
 app.post('/api/host/importar', (req, res) => {
-  const { banks: nuevos, ok: n, errors } = parseCsv(String(req.body ?? ''));
+  const { banks: nuevos, ok: n, errors } = parseCsv(String(req.body ?? ''), req.query.tema);
   if (!n) return res.status(400).json({ ok: 0, errors: errors.length ? errors : ['El archivo no traía preguntas.'] });
   saveBanks(BANKS_DIR, nuevos);
   banks = loadBanks(BANKS_DIR);

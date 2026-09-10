@@ -392,7 +392,9 @@ app.addEventListener('change', async (e) => {
   if (!file) return;
   impMsg = '<div class="note" style="margin-top:12px">Leyendo ' + esc(file.name) + '…</div>';
   render(st);
-  const r = await post('/api/host/importar', await file.text());
+  // El nombre del archivo es el nombre del tema: "Fracciones.csv" -> tema Fracciones.
+  const tema = file.name.replace(/\.[^.]*$/, '');
+  const r = await post('/api/host/importar?tema=' + encodeURIComponent(tema), await file.text());
   const d = r.data || {};
   const errores = (d.errors || []).length
     ? '<p style="margin:8px 0 0">' + d.errors.slice(0, 5).map(esc).join('<br>') + '</p>'

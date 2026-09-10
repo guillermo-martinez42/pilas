@@ -1,0 +1,5 @@
+Audios opcionales para la explicación por voz.
+El CSV puede traer las columnas audio_es y audio_quc con el nombre
+del archivo (por ejemplo 7x8.mp3) y este es el lugar donde va.
+El kiche NO tiene voz sintetica en ningun sistema: para ese idioma
+el audio grabado es la unica via.

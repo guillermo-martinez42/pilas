@@ -1,0 +1,15 @@
+{
+  "id": "escritura",
+  "label": "Escritura",
+  "cat": "Lenguaje",
+  "grade": "3.o-4.o",
+  "glyph": "E",
+  "order": 1002,
+  "questions": [
+    {
+      "text": "Escribi con tus palabras que aprendiste hoy.",
+      "open": true,
+      "why": "Cada alumno escribe su respuesta en el celular. No da puntos: la maestra las lee en el CSV de respuestas."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+node_modules/
+data/
+public/audio/*.mp3
+public/audio/*.m4a
+public/audio/*.ogg
+*.log
+*.torrent

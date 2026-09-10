@@ -1,0 +1,21 @@
+{
+  "id": "ortografia",
+  "label": "Ortografia",
+  "cat": "Lenguaje",
+  "grade": "3.o-4.o",
+  "glyph": "A",
+  "order": 1001,
+  "questions": [
+    {
+      "text": "Cual palabra lleva tilde?",
+      "opts": {
+        "A": "arbol",
+        "B": "arbol sin tilde",
+        "C": "papel",
+        "D": "reloj"
+      },
+      "correct": "A",
+      "why": "Las palabras graves que no terminan en n, s o vocal llevan tilde."
+    }
+  ]
+}

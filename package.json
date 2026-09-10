@@ -1,0 +1,19 @@
+{
+  "name": "tutorbox",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cuestionarios en el aula, sin internet.",
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server.js",
+    "test": "node --disable-warning=ExperimentalWarning test-room.js && node test-csv.js",
+    "seed-banks": "node scripts/seed-banks.mjs",
+    "reset-pin": "node --disable-warning=ExperimentalWarning scripts/reset-pin.mjs"
+  },
+  "dependencies": {
+    "csv-parse": "^5.6.0",
+    "express": "^4.21.2",
+    "qrcode": "^1.5.4"
+  },
+  "engines": { "node": ">=22.5" }
+}

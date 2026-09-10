@@ -1,0 +1,244 @@
+{
+  "order": 2,
+  "id": "multiplicacion",
+  "label": "Multiplicación",
+  "cat": "Matemáticas",
+  "grade": "3.º–4.º",
+  "glyph": "×",
+  "questions": [
+    {
+      "text": "¿Cuánto es 7 × 8?",
+      "opts": {
+        "A": "46",
+        "B": "56",
+        "C": "66",
+        "D": "49"
+      },
+      "correct": "B",
+      "dist": "D",
+      "why": "Multiplicar 7 × 8 es sumar 7 un total de 8 veces: da 56.",
+      "err": "eligieron 49: se quedaron una vez corta en la tabla del 7."
+    },
+    {
+      "text": "¿Cuánto es 6 × 9?",
+      "opts": {
+        "A": "64",
+        "B": "54",
+        "C": "44",
+        "D": "48"
+      },
+      "correct": "B",
+      "dist": "D",
+      "why": "Multiplicar 6 × 9 es sumar 6 un total de 9 veces: da 54.",
+      "err": "eligieron 48: se quedaron una vez corta en la tabla del 6."
+    },
+    {
+      "text": "¿Cuánto es 8 × 4?",
+      "opts": {
+        "A": "24",
+        "B": "22",
+        "C": "42",
+        "D": "32"
+      },
+      "correct": "D",
+      "dist": "A",
+      "why": "Multiplicar 8 × 4 es sumar 8 un total de 4 veces: da 32.",
+      "err": "eligieron 24: se quedaron una vez corta en la tabla del 8."
+    },
+    {
+      "text": "¿Cuánto es 9 × 7?",
+      "opts": {
+        "A": "54",
+        "B": "73",
+        "C": "53",
+        "D": "63"
+      },
+      "correct": "D",
+      "dist": "A",
+      "why": "Multiplicar 9 × 7 es sumar 9 un total de 7 veces: da 63.",
+      "err": "eligieron 54: se quedaron una vez corta en la tabla del 9."
+    },
+    {
+      "text": "¿Cuánto es 6 × 7?",
+      "opts": {
+        "A": "36",
+        "B": "52",
+        "C": "42",
+        "D": "32"
+      },
+      "correct": "C",
+      "dist": "A",
+      "why": "Multiplicar 6 × 7 es sumar 6 un total de 7 veces: da 42.",
+      "err": "eligieron 36: se quedaron una vez corta en la tabla del 6."
+    },
+    {
+      "text": "¿Cuánto es 8 × 8?",
+      "opts": {
+        "A": "74",
+        "B": "54",
+        "C": "56",
+        "D": "64"
+      },
+      "correct": "D",
+      "dist": "C",
+      "why": "Multiplicar 8 × 8 es sumar 8 un total de 8 veces: da 64.",
+      "err": "eligieron 56: se quedaron una vez corta en la tabla del 8."
+    },
+    {
+      "text": "¿Cuánto es 5 × 9?",
+      "opts": {
+        "A": "40",
+        "B": "45",
+        "C": "35",
+        "D": "55"
+      },
+      "correct": "B",
+      "dist": "A",
+      "why": "Multiplicar 5 × 9 es sumar 5 un total de 9 veces: da 45.",
+      "err": "eligieron 40: se quedaron una vez corta en la tabla del 5."
+    },
+    {
+      "text": "¿Cuánto es 7 × 6?",
+      "opts": {
+        "A": "35",
+        "B": "52",
+        "C": "42",
+        "D": "32"
+      },
+      "correct": "C",
+      "dist": "A",
+      "why": "Multiplicar 7 × 6 es sumar 7 un total de 6 veces: da 42.",
+      "err": "eligieron 35: se quedaron una vez corta en la tabla del 7."
+    },
+    {
+      "text": "¿Cuánto es 9 × 9?",
+      "opts": {
+        "A": "71",
+        "B": "81",
+        "C": "72",
+        "D": "91"
+      },
+      "correct": "B",
+      "dist": "C",
+      "why": "Multiplicar 9 × 9 es sumar 9 un total de 9 veces: da 81.",
+      "err": "eligieron 72: se quedaron una vez corta en la tabla del 9."
+    },
+    {
+      "text": "¿Cuánto es 4 × 7?",
+      "opts": {
+        "A": "38",
+        "B": "28",
+        "C": "18",
+        "D": "24"
+      },
+      "correct": "B",
+      "dist": "D",
+      "why": "Multiplicar 4 × 7 es sumar 4 un total de 7 veces: da 28.",
+      "err": "eligieron 24: se quedaron una vez corta en la tabla del 4."
+    },
+    {
+      "text": "¿Cuánto es 8 × 6?",
+      "opts": {
+        "A": "40",
+        "B": "48",
+        "C": "38",
+        "D": "58"
+      },
+      "correct": "B",
+      "dist": "A",
+      "why": "Multiplicar 8 × 6 es sumar 8 un total de 6 veces: da 48.",
+      "err": "eligieron 40: se quedaron una vez corta en la tabla del 8."
+    },
+    {
+      "text": "¿Cuánto es 9 × 4?",
+      "opts": {
+        "A": "46",
+        "B": "36",
+        "C": "27",
+        "D": "26"
+      },
+      "correct": "B",
+      "dist": "C",
+      "why": "Multiplicar 9 × 4 es sumar 9 un total de 4 veces: da 36.",
+      "err": "eligieron 27: se quedaron una vez corta en la tabla del 9."
+    },
+    {
+      "text": "Rosa tiene 6 cajas con 12 huevos cada una. ¿Cuántos hay en total?",
+      "opts": {
+        "A": "82",
+        "B": "72",
+        "C": "62",
+        "D": "18"
+      },
+      "correct": "B",
+      "dist": "D",
+      "why": "Hay 6 grupos iguales de 12: se multiplica 6 × 12 = 72.",
+      "err": "eligieron 18: sumaron en lugar de multiplicar."
+    },
+    {
+      "text": "Carlos tiene 5 cajas con 8 sillas cada una. ¿Cuántos hay en total?",
+      "opts": {
+        "A": "13",
+        "B": "40",
+        "C": "30",
+        "D": "50"
+      },
+      "correct": "B",
+      "dist": "A",
+      "why": "Hay 5 grupos iguales de 8: se multiplica 5 × 8 = 40.",
+      "err": "eligieron 13: sumaron en lugar de multiplicar."
+    },
+    {
+      "text": "La maestra tiene 7 cajas con 4 cuadernos cada una. ¿Cuántos hay en total?",
+      "opts": {
+        "A": "11",
+        "B": "28",
+        "C": "18",
+        "D": "38"
+      },
+      "correct": "B",
+      "dist": "A",
+      "why": "Hay 7 grupos iguales de 4: se multiplica 7 × 4 = 28.",
+      "err": "eligieron 11: sumaron en lugar de multiplicar."
+    },
+    {
+      "text": "Elena tiene 9 cajas con 6 panes cada una. ¿Cuántos hay en total?",
+      "opts": {
+        "A": "15",
+        "B": "44",
+        "C": "64",
+        "D": "54"
+      },
+      "correct": "D",
+      "dist": "A",
+      "why": "Hay 9 grupos iguales de 6: se multiplica 9 × 6 = 54.",
+      "err": "eligieron 15: sumaron en lugar de multiplicar."
+    },
+    {
+      "text": "Diego tiene 8 cajas con 5 canicas cada una. ¿Cuántos hay en total?",
+      "opts": {
+        "A": "13",
+        "B": "30",
+        "C": "40",
+        "D": "50"
+      },
+      "correct": "C",
+      "dist": "A",
+      "why": "Hay 8 grupos iguales de 5: se multiplica 8 × 5 = 40.",
+      "err": "eligieron 13: sumaron en lugar de multiplicar."
+    },
+    {
+      "text": "Ixchel tiene 4 cajas con 9 flores cada una. ¿Cuántos hay en total?",
+      "opts": {
+        "A": "13",
+        "B": "36",
+        "C": "26",
+        "D": "46"
+      },
+      "correct": "B",
+      "dist": "A",
+      "why": "Hay 4 grupos iguales de 9: se multiplica 4 × 9 = 36.",
+      "err": "eligieron 13: sumaron en lugar de multiplicar."
+    }
+  ]
+}

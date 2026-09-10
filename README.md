@@ -16,17 +16,16 @@ el TutorBox nunca lo usó.
 
 1. Encendés la mini PC. La pantalla del aula se abre sola con el **código QR**.
 2. Los alumnos escanean el QR con la cámara y escriben su nombre.
-3. Abrís `/maestra` en tu teléfono, ponés tu PIN y seguís los cuatro pasos:
-   **tema → cuántas preguntas → quiénes están listos → comenzar**.
+3. Abrís `/maestra` en tu teléfono, ponés tu PIN y seguís los tres pasos:
+   **elegir (o crear) el cuestionario → quiénes están listos → comenzar**.
+   Se juegan todas las preguntas del cuestionario, en el orden en que las escribiste.
 4. Cada pregunta dura 20 segundos, pero vos decidís cuándo pasar a la siguiente.
-5. Al final: promedio del grupo, clasificación, preguntas más difíciles y los
-   errores que se repiten. El botón *Guardar reporte del grupo* baja un Excel.
+5. Al final: promedio del grupo, clasificación y preguntas más difíciles. El botón
+   *Guardar reporte del grupo* baja un Excel.
 
 Mientras juegan, en tu teléfono ves **qué contestó cada alumno en vivo**. Eso no
 se proyecta: en la pared solo salen la pregunta y el tiempo.
 
-Si más de la mitad del grupo elige **el mismo error**, TutorBox te avisa y te
-ofrece explicarlo por voz.
 
 ---
 
@@ -56,15 +55,20 @@ no sirve para entrar como maestra.
 
 ---
 
-## Poner tus propias preguntas
+## Tus cuestionarios
 
-En el paso 1 (elegir tema) hay dos botones:
+TutorBox no trae preguntas: los cuestionarios son tuyos. En el paso 1 hay dos botones.
 
-1. **Bajar plantilla** — te da un archivo con ejemplos y las columnas en orden.
-2. Lo abrís en Excel, borrás los ejemplos y escribís tus preguntas.
-3. Guardás como CSV **con el nombre del tema** (`Fracciones.csv` → tema *Fracciones*)
-   y **Subir mi archivo**. El tema aparece al instante.
+### Crear uno nuevo (en el teléfono)
 
+Le ponés nombre y escribís pregunta por pregunta: el enunciado, **la respuesta
+correcta** y hasta tres respuestas más. *Agregar otra pregunta* las veces que haga
+falta y *Guardar cuestionario*. Queda guardado y elegido para jugar.
+
+### Subir archivo CSV (desde Excel)
+
+*Bajá la plantilla*, borrá los ejemplos, escribí tus preguntas y guardá como CSV
+**con el nombre del cuestionario** (`Fracciones.csv` → cuestionario *Fracciones*).
 Una fila por pregunta, seis columnas, sin nada más:
 
 | Columna | Qué va |
@@ -81,22 +85,24 @@ Una fila por pregunta, seis columnas, sin nada más:
 ```
 
 La correcta siempre va en la columna 3: TutorBox las baraja al importar, así no
-cae siempre en la A. Si la primera fila es un encabezado, se salta sola.
+cae siempre en la A. Si la primera fila es un encabezado, se salta sola; si Excel
+deja una cola de comas al final de cada línea, también.
 
 ### Preguntas de respuesta abierta
 
-Dejá **las cuatro respuestas vacías** (fila 3 del ejemplo). En el celular aparece
-una caja de texto (hasta 200 letras) en vez de las opciones. Mientras contestan,
-vos ves en tu panel quién ya escribió y **qué escribió cada uno**. Estas preguntas
-**no dan puntos** — no hay respuesta correcta que comparar — así que no entran en
-el promedio ni en la clasificación. Al terminar el juego, el botón *Descargar
-respuestas escritas* baja un CSV con una fila por alumno y pregunta.
+Dejá **las cuatro respuestas vacías** (fila 3 del ejemplo, o los cuatro campos en
+blanco al crear). En el celular aparece una caja de texto (hasta 200 letras) en vez
+de las opciones. Mientras contestan, vos ves en tu panel quién ya escribió y **qué
+escribió cada uno**. Estas preguntas **no dan puntos** — no hay respuesta correcta
+que comparar — así que no entran en el promedio ni en la clasificación. Al terminar
+el juego, el botón *Descargar respuestas escritas* baja un CSV con una fila por
+alumno y pregunta.
 
 Si una fila tiene un problema (una sola respuesta, sin pregunta), **se importan
 todas las demás** y te dice cuáles saltó. No perdés 40 preguntas por un typo.
 
-Los avisos de "más de la mitad eligió el mismo error" y la explicación por voz
-sólo existen en los temas que trae TutorBox: el archivo simple no los lleva.
+Los cuestionarios se guardan en `banks/` de la máquina que corre TutorBox. En
+Render (plan gratis) esa carpeta se borra con cada deploy: guardá el CSV.
 
 ---
 
@@ -121,7 +127,6 @@ cambia, el código QR deja de servir.
 
 ```bash
 npm install
-npm run seed-banks
 npm start          # si el puerto 80 no se puede, usa el 3000 solo
 ```
 
@@ -142,23 +147,18 @@ npm test           # chequeos del núcleo y del importador de CSV
 | Olvidaste el PIN | `npm run reset-pin` en la mini PC. |
 | No entra nadie | Revisá que estén en el **mismo wifi**, no en otro de la escuela. |
 | La dirección sale rara (26.x, 172.x) | La máquina tiene una VPN o red virtual. Arrancá con `HOST_IP=` y la dirección buena. |
-| No se oye la explicación | Subí el volumen del proyector. Y ojo con el k'iche' (abajo). |
 | Se apaga la pantalla sola | El instalador ya desactiva el protector; si vuelve, revisá el ahorro de energía del escritorio. |
 
 Ver qué está pasando: `sudo journalctl -u tutorbox -f`
 
 ---
 
-## La voz
+## La voz y el aviso de "error repetido"
 
-- **Español:** lo lee la voz del sistema de la mini PC. Funciona sin internet.
-  *Conviene probarlo en la máquina de verdad*: si esa instalación de Linux no
-  trae voces en español, hay que instalarlas (`sudo apt install espeak-ng`) o
-  usar audios grabados.
-- **K'iche':** no existe voz sintética de k'iche' en ningún sistema. La única
-  forma es **grabar los audios**. Se ponen en `public/audio/` y se nombran en las
-  campos `audio_es` / `audio_quc` del banco (`banks/*.json`). Si una pregunta no tiene audio en
-  k'iche', el botón no aparece.
+Quedan en el código pero **apagados**: sólo funcionan con bancos JSON que traigan
+los campos `dist`, `why`, `err` y `audio_es` / `audio_quc`, y los cuestionarios que
+se crean o suben no los tienen. Si algún día hacen falta, es cuestión de sumar esas
+columnas al importador.
 
 ## Notas técnicas
 
@@ -198,9 +198,9 @@ que vive en el servidor. Pero sí corre gratis en Render.
    `https://<nombre>.onrender.com`, `/maestra` y `/pantalla`.
 
 **Ojo con el plan gratis:** se duerme a los 15 minutos sin uso y tarda cerca de un
-minuto en despertar. Abrí `/pantalla` un par de minutos antes de la clase. Los CSV
-que importe la maestra se pierden con el próximo deploy: los vuelve a subir, o los
-hacés commit en `banks/`.
+minuto en despertar. Abrí `/pantalla` un par de minutos antes de la clase. Los
+cuestionarios se pierden con el próximo deploy: la maestra guarda el CSV y lo
+vuelve a subir.
 
 Lo mismo sirve en un VPS de $4 detrás de Caddy, o en la mini PC con un túnel de
 Cloudflare: mismas dos variables, `PUBLIC_URL` con la dirección pública.

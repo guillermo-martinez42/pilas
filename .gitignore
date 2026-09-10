@@ -5,3 +5,4 @@ public/audio/*.m4a
 public/audio/*.ogg
 *.log
 *.torrent
+banks/

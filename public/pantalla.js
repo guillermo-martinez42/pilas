@@ -20,7 +20,7 @@ const join = (s) =>
 const hint = '<div class="hint">Si tu celular dice que esta red no tiene internet, elegí «Mantener conexión».</div>';
 
 function skeleton(s) {
-  if (s.step === 'topic' || s.step === 'count') {
+  if (s.step === 'topic') {
     return '<div class="pane stepIn">' +
       '<div class="logo" style="width:96px;height:96px;border-radius:30px;font-size:46px">T</div>' +
       '<h1 class="title">TutorBox está listo</h1>' +
@@ -101,10 +101,7 @@ function speak(s) {
 
 function render(s) {
   st = s;
-  // 'topic' y 'count' dibujan la misma espera: una sola llave, para no
-  // reanimar el proyector cuando la maestra avanza entre esos dos pasos.
-  const paso = (s.step === 'topic' || s.step === 'count') ? 'idle' : s.step;
-  mount(root, paso + ':' + s.qNum, () => skeleton(s));
+  mount(root, s.step + ':' + s.qNum, () => skeleton(s));
   setText('#n', s.connected);
   if (s.step === 'reveal') speak(s);
   tick();

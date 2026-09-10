@@ -16,7 +16,6 @@ echo
 # --- dependencias y preguntas ------------------------------------------
 cd "$APP"
 npm install --omit=dev --no-audit --no-fund
-[ -f banks/sumas.json ] || npm run seed-banks
 
 # --- puerto 80 sin correr como root ------------------------------------
 # Así la dirección es http://192.168.x.x, sin ":3000" que nadie recuerda.

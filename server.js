@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { Room } from './lib/room.js';
 import { openDb } from './lib/db.js';
-import { loadBanks, saveBanks, parseCsv, templateCsv } from './lib/bank.js';
+import { loadBanks, saveBanks, parseCsv, buildBank, templateCsv } from './lib/bank.js';
 import {
   PIN_RE, COOKIE, hashPin, pinMatches, lockedFor, noteFail, noteOk,
   newToken, readCookie, setHostCookie, clearHostCookie,
@@ -28,8 +28,7 @@ if (PIN_RE.test(seedPin) && !db.teacher()) {
   const { hash, salt } = hashPin(seedPin);
   db.saveTeacher(hash, salt);
 }
-let banks = loadBanks(BANKS_DIR);
-if (!banks.length) console.error('No hay bancos de preguntas. Corré: npm run seed-banks');
+let banks = loadBanks(BANKS_DIR);   // los cuestionarios de la maestra; vacío al principio
 
 const room = new Room({ banks, db, onChange: () => scheduleBroadcast() });
 
@@ -80,7 +79,11 @@ function payload(c) {
 }
 
 function pushTo(c) {
-  try { c.res.write('data: ' + JSON.stringify(payload(c)) + '\n\n'); } catch { /* se cayó; el close lo limpia */ }
+  // Si armar la vista falla, que se vea en el log: si no, ese rol deja de
+  // recibir estado en silencio mientras los demás siguen andando.
+  let data;
+  try { data = JSON.stringify(payload(c)); } catch (e) { console.error('Vista ' + c.role + ':', e); return; }
+  try { c.res.write('data: ' + data + '\n\n'); } catch { /* se cayó; el close lo limpia */ }
 }
 
 // Si 20 alumnos contestan a la vez no mandamos 20 ráfagas: juntamos en una.
@@ -201,8 +204,6 @@ app.use('/api/host', (req, res, next) => {
 
 const ok = (res) => res.json({ ok: true });
 app.post('/api/host/tema', (req, res) => { room.setTopic(req.body?.id); ok(res); });
-app.post('/api/host/filtro', (req, res) => { room.setFilter(req.body?.filter); ok(res); });
-app.post('/api/host/cantidad', (req, res) => { room.setCount(req.body?.n); ok(res); });
 app.post('/api/host/avanzar', (_req, res) => { room.advance(); ok(res); });
 app.post('/api/host/secundario', (_req, res) => { room.secondary(); ok(res); });
 app.post('/api/host/atras', (_req, res) => { room.back(); ok(res); });
@@ -217,15 +218,26 @@ app.get('/api/host/plantilla.csv', (_req, res) => {
     .send(templateCsv());
 });
 
-app.post('/api/host/importar', (req, res) => {
-  const { banks: nuevos, ok: n, errors } = parseCsv(String(req.body ?? ''), req.query.tema);
-  if (!n) return res.status(400).json({ ok: 0, errors: errors.length ? errors : ['El archivo no traía preguntas.'] });
+// Guarda el cuestionario nuevo y lo deja elegido: subir o crear es el paso 1 hecho.
+function guardarCuestionario(res, { banks: nuevos, ok: n, errors }) {
+  if (!n) return res.status(400).json({ ok: 0, errors: errors.length ? errors : ['No traía preguntas.'] });
   saveBanks(BANKS_DIR, nuevos);
   banks = loadBanks(BANKS_DIR);
-  room.banks = banks;              // los temas nuevos aparecen sin reiniciar
-  if (!banks.some((b) => b.id === room.topic)) room.topic = banks[0]?.id ?? null;
-  room.changed();
+  room.banks = banks;              // aparece sin reiniciar
+  room.setTopic(nuevos[0].id);
   res.json({ ok: n, temas: nuevos.map((b) => b.label), errors });
+}
+
+app.post('/api/host/importar', (req, res) => {
+  guardarCuestionario(res, parseCsv(String(req.body ?? ''), req.query.tema));
+});
+
+// Escrito a mano en el teléfono: { tema, preguntas: [{ text, answers: [correcta, ...otras] }] }
+app.post('/api/host/crear', (req, res) => {
+  const { tema, preguntas } = req.body ?? {};
+  const rows = (Array.isArray(preguntas) ? preguntas : []).slice(0, 200)
+    .map((q, i) => [i + 1, q?.text, ...(Array.isArray(q?.answers) ? q.answers.slice(0, 4) : [])]);
+  guardarCuestionario(res, buildBank(tema, rows));
 });
 
 // Reporte para Excel: una fila por alumno, y abajo el detalle por pregunta.

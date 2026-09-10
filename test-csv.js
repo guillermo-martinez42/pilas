@@ -32,6 +32,17 @@ assert.equal(r2.banks[0].questions[0].text.includes('mano, más'), true, 'respet
 assert.equal(r2.banks[0].questions[1].open, true);
 console.log('OK comas + sin encabezado');
 
+// 2b) Excel guardó ';' adentro y una cola de comas afuera (caso real de la maestra).
+const cola = '﻿N;Pregunta;Respuesta correcta;Respuesta 2;Respuesta 3;Respuesta 4,,,,,,,,\r\n' +
+  '1;¿Quién fue Marco Aurelio?;Emperador y filósofo estoico;Un general cartaginés;Un orador;,,,,,,,,\r\n' +
+  '2;Explicá la dicotomía del control.;;;;,,,,,,,,\r\n';
+const r2b = parseCsv(cola, 'Estoicos');
+assert.equal(r2b.ok, 2, 'la cola de comas no rompe el archivo: ' + r2b.errors.join(' | '));
+assert.equal(Object.keys(r2b.banks[0].questions[0].opts).length, 3, 'tres respuestas, sin comas pegadas');
+assert.equal(r2b.banks[0].questions[0].opts[r2b.banks[0].questions[0].correct], 'Emperador y filósofo estoico');
+assert.equal(r2b.banks[0].questions[1].open, true, 'la fila sin respuestas queda abierta');
+console.log('OK cola de comas de Excel');
+
 // 3) Filas malas: se reportan pero NO tumban el archivo.
 const sucio = '1;Pregunta buena;1;2;3;4\n' +
   '2;Una sola respuesta;1;;;\n' +

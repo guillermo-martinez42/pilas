@@ -52,8 +52,10 @@ export async function post(path, body) {
 // animaciones no se reinician con cada respuesta que llega.
 export function mount(root, key, build) {
   if (root.dataset.k === key) return false;
-  root.dataset.k = key;
+  // La llave se guarda DESPUÉS de construir: si build() falla, el próximo
+  // estado vuelve a intentar en vez de dejar la pantalla vieja congelada.
   root.innerHTML = build();
+  root.dataset.k = key;
   return true;
 }
 

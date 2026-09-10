@@ -2,16 +2,20 @@
 // Lo que importa aquí es que el servidor no se deje engañar por el cliente.
 import assert from 'node:assert/strict';
 import { Room } from './lib/room.js';
-import { loadBanks } from './lib/bank.js';
-import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-const banks = loadBanks(join(HERE, 'banks'));
-assert.ok(banks.length >= 4, 'faltan bancos: corré npm run seed-banks');
+// Un banco de prueba con las tres preguntas y un distractor en la primera,
+// para el aviso de "más de la mitad eligió el mismo error".
+const banks = [{
+  id: 'sumas', label: 'Sumas', cat: 'General', grade: 'todos', glyph: 'S', order: 1000,
+  questions: [
+    { text: '24 + 18', opts: { A: '42', B: '32', C: '41', D: '46' }, correct: 'A', dist: 'B', why: 'Se lleva 1.', err: 'olvidaron llevar la decena.' },
+    { text: '3 + 3', opts: { A: '5', B: '6', C: '7' }, correct: 'B' },
+    { text: '1 + 1', opts: { A: '2', B: '3' }, correct: 'A' },
+  ],
+}];
 
 const nuevo = () => new Room({ banks });
-const jugar = (r) => { r.advance(); r.advance(); r.advance(); };   // topic -> count -> lobby -> question
+const jugar = (r) => { r.advance(); r.advance(); };   // topic -> lobby -> question
 
 let room = nuevo();
 try {
@@ -25,8 +29,10 @@ try {
 
   // --- el asistente vive en el servidor ---
   assert.equal(room.step, 'topic');
+  assert.equal(room.count, 3, 'se juega el cuestionario entero: no se pregunta cuántas');
   jugar(room);
-  assert.equal(room.step, 'question', 'tres avances llegan a la primera pregunta');
+  assert.equal(room.step, 'question', 'dos avances llegan a la primera pregunta');
+  assert.equal(room.current().text, '24 + 18', 'en el orden en que la maestra las escribió');
   assert.ok(room.deadline > Date.now(), 'la pregunta trae fecha límite');
 
   // --- LA PRUEBA QUE IMPORTA: la respuesta correcta no viaja antes de tiempo ---
@@ -85,7 +91,6 @@ try {
   room = nuevo();
   const uno = room.join('Ana');
   const dos = room.join('Beto');
-  room.setCount(3);
   jugar(room);
   for (let i = 0; i < 3; i++) {
     const qq = room.current();
@@ -121,9 +126,7 @@ try {
   });
   const ana = room.join('Ana');
   const beto = room.join('Beto');
-  room.setCount(3);
   jugar(room);
-  // startGame baraja, así que recorremos las tres y comprobamos según el tipo.
   let abiertas = 0;
   for (let i = 0; i < 3; i++) {
     const q = room.current();
@@ -155,13 +158,12 @@ try {
   assert.equal(sa.avg, 50, 'promedio sobre la calificable: Ana 1, Beto 0');
   assert.equal(sa.hardest.length, 1, 'las abiertas no entran en las más difíciles');
 
-  // --- la cantidad nunca puede pedir más preguntas de las que hay ---
-  room = nuevo();
-  room.setTopic('geometria');
-  room.setCount(20);
-  assert.equal(room.count, 14, 'se limita al tamaño del banco de geometría');
-  room.setCount(1);
-  assert.equal(room.count, 3, 'y nunca baja de 3');
+  // --- sin cuestionarios no se puede avanzar ---
+  room.stopTimer();
+  room = new Room({ banks: [] });
+  room.advance();
+  assert.equal(room.step, 'topic', 'sin cuestionario, Continuar no hace nada');
+  assert.equal(room.hostView().topics.length, 0);
 
   console.log('OK — todos los chequeos pasaron');
 } finally {

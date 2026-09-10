@@ -7,7 +7,6 @@
   "scripts": {
     "start": "node --disable-warning=ExperimentalWarning server.js",
     "test": "node --disable-warning=ExperimentalWarning test-room.js && node test-csv.js",
-    "seed-banks": "node scripts/seed-banks.mjs",
     "reset-pin": "node --disable-warning=ExperimentalWarning scripts/reset-pin.mjs"
   },
   "dependencies": {

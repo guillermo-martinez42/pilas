@@ -220,3 +220,4 @@ public/bus.js       conexión, reloj y ayudas compartidas
 test-room.js        chequeos del núcleo
 test-csv.js         chequeos del importador
 ```
+# pilas

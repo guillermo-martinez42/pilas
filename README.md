@@ -17,9 +17,9 @@ el TutorBox nunca lo usó.
 1. Encendés la mini PC. La pantalla del aula se abre sola con el **código QR**.
 2. Los alumnos escanean el QR con la cámara y escriben su nombre.
 3. Abrís `/maestra` en tu teléfono, ponés tu PIN y seguís los tres pasos:
-   **elegir (o crear) el cuestionario → quiénes están listos → comenzar**.
-   Se juegan todas las preguntas del cuestionario, en el orden en que las escribiste.
-4. Cada pregunta dura 20 segundos, pero vos decidís cuándo pasar a la siguiente.
+   **crear o subir el cuestionario → quiénes están listos → comenzar**.
+   Se juegan todas las preguntas, en el orden en que las escribiste.
+4. Cada pregunta dura los segundos que le pusiste, pero vos decidís cuándo pasar a la siguiente.
 5. Al final: promedio del grupo, clasificación y preguntas más difíciles. El botón
    *Guardar reporte del grupo* baja un Excel.
 
@@ -59,32 +59,34 @@ no sirve para entrar como maestra.
 
 TutorBox no trae preguntas: los cuestionarios son tuyos. En el paso 1 hay dos botones.
 
-### Crear uno nuevo (en el teléfono)
+### Crear mi cuestionario (en el teléfono)
 
-Le ponés nombre y escribís pregunta por pregunta: el enunciado, **la respuesta
-correcta** y hasta tres respuestas más. *Agregar otra pregunta* las veces que haga
-falta y *Guardar cuestionario*. Queda guardado y elegido para jugar.
+Le ponés nombre y decís cuántas preguntas tiene. Después, una pantalla por
+pregunta: el enunciado, **la respuesta correcta**, hasta tres respuestas más y,
+junto al relojito ⏱, **cuántos segundos dura**. *Siguiente* hasta la última y
+*Guardar cuestionario*. Queda cargado para jugar.
 
-### Subir archivo CSV (desde Excel)
+### Subir plantilla CSV (desde Excel)
 
 *Bajá la plantilla*, borrá los ejemplos, escribí tus preguntas y guardá como CSV
 **con el nombre del cuestionario** (`Fracciones.csv` → cuestionario *Fracciones*).
-Una fila por pregunta, seis columnas, sin nada más:
+Una fila por pregunta, siete columnas, sin nada más:
 
 | Columna | Qué va |
 |:--|:--|
 | 1 | El número de la pregunta (1, 2, 3…) |
-| 2 | La pregunta |
-| 3 | **La respuesta correcta** |
-| 4, 5, 6 | Las otras respuestas (podés dejar una o dos vacías) |
+| 2 | **Segundos** que dura (vacío = 20) |
+| 3 | La pregunta |
+| 4 | **La respuesta correcta** |
+| 5, 6, 7 | Las otras respuestas (podés dejar una o dos vacías) |
 
 ```
-1;¿Cuánto es 24 + 18?;42;32;41;46
-2;¿Cuál palabra lleva tilde?;árbol;papel;reloj;
-3;Escribí con tus palabras qué aprendiste hoy.;;;;
+1;20;¿Cuánto es 24 + 18?;42;32;41;46
+2;15;¿Cuál palabra lleva tilde?;árbol;papel;reloj;
+3;90;Escribí con tus palabras qué aprendiste hoy.;;;;
 ```
 
-La correcta siempre va en la columna 3: TutorBox las baraja al importar, así no
+La correcta siempre va en la columna 4: TutorBox las baraja al importar, así no
 cae siempre en la A. Si la primera fila es un encabezado, se salta sola; si Excel
 deja una cola de comas al final de cada línea, también.
 
@@ -101,8 +103,9 @@ alumno y pregunta.
 Si una fila tiene un problema (una sola respuesta, sin pregunta), **se importan
 todas las demás** y te dice cuáles saltó. No perdés 40 preguntas por un typo.
 
-Los cuestionarios se guardan en `banks/` de la máquina que corre TutorBox. En
-Render (plan gratis) esa carpeta se borra con cada deploy: guardá el CSV.
+El último cuestionario creado o subido queda cargado hasta que subas otro. Se
+guarda en `banks/` de la máquina que corre TutorBox; en Render (plan gratis) esa
+carpeta se borra con cada deploy, así que guardá tu CSV.
 
 ---
 

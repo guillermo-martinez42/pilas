@@ -2,7 +2,6 @@
 // llega del servidor únicamente cuando la maestra revela.
 import { connect, post, esc, mount, $, setText, secondsLeft, ringStyle, everyTick, saveLocal, readLocal } from '/bus.js';
 
-const QUESTION_MS = 20000;
 const shell = $('#shell');
 const root = $('#root');
 const who = $('#who');
@@ -182,7 +181,7 @@ function tick() {
   const ring = $('#ring');
   setText('#t', left);
   if (ring) {
-    ring.style.background = ringStyle(st.deadline, QUESTION_MS, left <= 5);
+    ring.style.background = ringStyle(st.deadline, st.qMs || 20000, left <= 5);
     ring.classList.toggle('low', left <= 5);
   }
 }

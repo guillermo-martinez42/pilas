@@ -2,7 +2,6 @@
 // nunca respuestas por alumno, y la correcta sólo cuando la maestra revela.
 import { connect, esc, mount, $, setText, secondsLeft, ringStyle, everyTick } from '/bus.js';
 
-const QUESTION_MS = 20000;
 const root = $('#root');
 let st = null;
 let lastVoice = 0;
@@ -113,7 +112,7 @@ function tick() {
   const ring = $('#ring');
   setText('#t', left);
   if (ring) {
-    ring.style.background = ringStyle(st.deadline, QUESTION_MS, left <= 5);
+    ring.style.background = ringStyle(st.deadline, st.qMs || 20000, left <= 5);
     ring.classList.toggle('low', left <= 5);
   }
 }

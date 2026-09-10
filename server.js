@@ -232,11 +232,11 @@ app.post('/api/host/importar', (req, res) => {
   guardarCuestionario(res, parseCsv(String(req.body ?? ''), req.query.tema));
 });
 
-// Escrito a mano en el teléfono: { tema, preguntas: [{ text, answers: [correcta, ...otras] }] }
+// Escrito a mano en el teléfono: { tema, preguntas: [{ seconds, text, answers: [correcta, ...otras] }] }
 app.post('/api/host/crear', (req, res) => {
   const { tema, preguntas } = req.body ?? {};
   const rows = (Array.isArray(preguntas) ? preguntas : []).slice(0, 200)
-    .map((q, i) => [i + 1, q?.text, ...(Array.isArray(q?.answers) ? q.answers.slice(0, 4) : [])]);
+    .map((q, i) => [i + 1, q?.seconds, q?.text, ...(Array.isArray(q?.answers) ? q.answers.slice(0, 4) : [])]);
   guardarCuestionario(res, buildBank(tema, rows));
 });
 

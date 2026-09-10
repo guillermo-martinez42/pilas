@@ -2,12 +2,11 @@
 // servidor: si alguien abre esta página sin el PIN, los botones no hacen nada.
 import { connect, post, esc, mount, $, $$, setText, secondsLeft, ringStyle, everyTick } from '/bus.js';
 
-const QUESTION_MS = 20000;
 const app = $('#app');
 let st = null;
 
 const TITULOS = {
-  topic: ['Paso 1 de 3', 'Elegir cuestionario'],
+  topic: ['Paso 1 de 3', 'Las preguntas'],
   crear: ['Paso 1 de 3', 'Nuevo cuestionario'],
   lobby: ['Paso 2 de 3', 'Alumnos listos'],
   question: ['En juego', 'Respuestas en vivo'],
@@ -16,7 +15,7 @@ const TITULOS = {
 };
 
 const PRINCIPAL = {
-  topic: 'Continuar', crear: 'Guardar cuestionario', lobby: 'Comenzar el juego',
+  topic: 'Continuar', crear: 'Siguiente', lobby: 'Comenzar el juego',
   question: 'Terminar la pregunta', stats: 'Nuevo juego',
 };
 
@@ -109,59 +108,65 @@ function escritas(s) {
 // ================= pasos del asistente =================
 
 function pasoTema(s) {
-  const cards = s.topics.map((t) =>
-    '<button class="topic' + (t.id === s.topic ? ' on' : '') + '" data-t="' + esc(t.id) + '">' +
-      '<span class="g">' + esc(t.glyph) + '</span>' +
-      '<span class="m"><b>' + esc(t.label) + '</b><span>' + esc(t.meta) + '</span></span>' +
-      '<span class="tick">' + (t.id === s.topic ? '✓' : '') + '</span></button>').join('');
+  const cargado = s.topic
+    ? '<div class="note"><div style="font-size:13px;color:var(--muted-2);font-weight:600;letter-spacing:.3px">CUESTIONARIO CARGADO</div>' +
+      '<div style="font-size:20px;font-weight:600;margin-top:2px">' + esc(s.topicLabel) + '</div>' +
+      '<div style="font-size:15px;color:var(--muted)">' + s.total + ' preguntas · se juegan todas, en orden</div></div>'
+    : '';
   return '<div class="stack stepIn">' +
-    '<h1 class="h1">¿Qué cuestionario<br>vamos a jugar?</h1>' +
-    '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
-      '<button class="btn soft" id="crear" style="flex:1;min-width:150px">Crear uno nuevo</button>' +
-      '<button class="btn soft" id="subir" style="flex:1;min-width:150px">Subir archivo CSV</button>' +
-    '</div>' +
+    '<h1 class="h1">¿Con qué preguntas<br>jugamos hoy?</h1>' +
+    '<button class="btn soft" id="crear" style="height:72px;font-size:18px">Crear mi cuestionario</button>' +
+    '<button class="btn soft" id="subir" style="height:72px;font-size:18px">Subir plantilla CSV</button>' +
     '<input type="file" id="archivo" accept=".csv,text/csv" hidden>' +
-    '<div id="impRes"></div>' +
-    (cards
-      ? '<div class="h2">Mis cuestionarios</div><div class="stack" style="gap:12px">' + cards + '</div>'
-      : '<div class="note">Todavía no hay ningún cuestionario. Creá uno acá mismo o subí un archivo CSV.</div>') +
-    '<div class="note" style="font-size:15px;color:var(--muted-2)">¿Preferís Excel? ' +
-      '<a href="/api/host/plantilla.csv">Bajá la plantilla</a>: número, pregunta, respuesta correcta y hasta tres más. ' +
+    '<div id="impRes"></div>' + cargado +
+    '<div class="note" style="font-size:15px;color:var(--muted-2)">' +
+      '<a href="/api/host/plantilla.csv">Bajá la plantilla</a>: número, segundos, pregunta, respuesta correcta y hasta tres más. ' +
       'Las cuatro respuestas vacías = pregunta abierta. El nombre del archivo es el nombre del cuestionario.</div>' +
   '</div>';
 }
 
-// Formulario para escribir el cuestionario en el teléfono. Vive sólo en el
-// navegador hasta que se guarda; se reconstruye una vez y las respuestas que
-// llegan por SSE no lo tocan (ver clave()).
-const filaPregunta = (n) =>
-  '<div class="card preg" style="display:flex;flex-direction:column;gap:10px">' +
-    '<div class="h2">Pregunta <span class="num">' + n + '</span></div>' +
-    '<textarea class="field libre" rows="2" maxlength="300" placeholder="Escribí la pregunta" aria-label="Pregunta"></textarea>' +
-    '<input class="field resp" maxlength="120" placeholder="Respuesta correcta" aria-label="Respuesta correcta" style="border-color:var(--ok)">' +
-    '<input class="field resp" maxlength="120" placeholder="Otra respuesta" aria-label="Respuesta 2">' +
-    '<input class="field resp" maxlength="120" placeholder="Otra respuesta" aria-label="Respuesta 3">' +
-    '<input class="field resp" maxlength="120" placeholder="Otra respuesta" aria-label="Respuesta 4">' +
-    '<div style="font-size:14px;color:var(--muted-2)">Dejá las cuatro respuestas vacías para que los alumnos escriban la suya.</div>' +
-  '</div>';
+// Asistente "crear mi cuestionario": primero nombre y cantidad, después una
+// pantalla por pregunta. Vive sólo en el navegador hasta que se guarda.
+let borrador = null;   // { tema, n, i, preguntas: [{ seconds, text, answers }] }  · i = -1 es la pantalla de cantidad
 
-function pasoCrear() {
+function pasoCrearCantidad() {
   return '<div class="stack stepIn">' +
-    '<input class="field" id="tema" maxlength="40" placeholder="Nombre del cuestionario" aria-label="Nombre del cuestionario">' +
-    '<div id="preguntas" class="stack" style="gap:14px">' + filaPregunta(1) + '</div>' +
-    '<button class="btn soft" id="masPregunta">+ Agregar otra pregunta</button>' +
+    '<h1 class="h1">¿Cómo se llama y<br>cuántas preguntas tiene?</h1>' +
+    '<input class="field" id="tema" maxlength="40" placeholder="Nombre del cuestionario" aria-label="Nombre del cuestionario" value="' + esc(borrador.tema) + '">' +
+    '<label class="note" style="display:flex;align-items:center;justify-content:space-between;gap:12px">' +
+      '<span style="font-size:17px">Cantidad de preguntas</span>' +
+      '<input class="field" id="cantidad" type="number" inputmode="numeric" min="1" max="50" value="' + borrador.n + '" style="width:110px;text-align:center">' +
+    '</label>' +
+    '<p style="font-size:15px;color:var(--muted-2);line-height:1.5;margin:0">Después escribís cada pregunta con sus respuestas y cuántos segundos dura.</p>' +
+  '</div>';
+}
+
+function pasoCrearPregunta() {
+  const q = borrador.preguntas[borrador.i] || { seconds: 20, text: '', answers: ['', '', '', ''] };
+  const resp = (k, ph, extra) =>
+    '<input class="field resp" maxlength="120" placeholder="' + ph + '" aria-label="' + ph + '" value="' + esc(q.answers[k] || '') + '"' + (extra || '') + '>';
+  return '<div class="stack stepIn">' +
+    '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px">' +
+      '<h1 class="h1" style="margin:0">Pregunta ' + (borrador.i + 1) + ' de ' + borrador.n + '</h1>' +
+      '<label title="Segundos para responder" style="display:flex;align-items:center;gap:4px;background:var(--chip);border-radius:22px;padding:8px 14px;color:var(--brand);font-weight:600;font-size:18px">' +
+        '<span aria-hidden="true">⏱</span>' +
+        '<input id="segundos" type="number" inputmode="numeric" min="5" max="300" value="' + q.seconds + '" aria-label="Segundos para responder" ' +
+          'style="width:58px;border:0;background:transparent;font:inherit;color:inherit;text-align:center;outline:none">' +
+        '<span>s</span></label>' +
+    '</div>' +
+    '<textarea class="field libre" id="texto" rows="3" maxlength="300" placeholder="Escribí la pregunta" aria-label="Pregunta">' + esc(q.text) + '</textarea>' +
+    resp(0, 'Respuesta correcta', ' style="border-color:var(--ok)"') +
+    resp(1, 'Otra respuesta') + resp(2, 'Otra respuesta') + resp(3, 'Otra respuesta') +
+    '<div class="note" style="font-size:14px;color:var(--muted-2)">Dejá las cuatro respuestas vacías para que los alumnos escriban la suya.</div>' +
     '<div id="impRes"></div>' +
   '</div>';
 }
 
-// Lee el formulario. Las filas sin pregunta se ignoran (la maestra agregó de más).
-function leerCuestionario() {
-  return {
-    tema: $('#tema').value,
-    preguntas: $$('.preg').map((c) => ({
-      text: $('textarea', c).value,
-      answers: $$('.resp', c).map((i) => i.value),
-    })).filter((q) => q.text.trim()),
+function leerPregunta() {
+  borrador.preguntas[borrador.i] = {
+    seconds: Number($('#segundos').value) || 20,
+    text: $('#texto').value,
+    answers: $$('.resp').map((i) => i.value),
   };
 }
 
@@ -294,10 +299,9 @@ function pasoResumen(s) {
 
 const PASOS = ['topic', 'lobby', 'question', 'reveal', 'stats'];
 let impMsg = '';
-let creando = false;   // el formulario de cuestionario nuevo está abierto
 
 function contenido(s) {
-  if (s.step === 'topic') return creando ? pasoCrear() : pasoTema(s);
+  if (s.step === 'topic') return !borrador ? pasoTema(s) : borrador.i < 0 ? pasoCrearCantidad() : pasoCrearPregunta();
   if (s.step === 'lobby') return pasoSala(s);
   if (s.step === 'question') return pasoPregunta(s);
   if (s.step === 'reveal') return pasoResultado(s);
@@ -305,15 +309,16 @@ function contenido(s) {
 }
 
 function armazon(s) {
-  const paso = s.step === 'topic' && creando ? 'crear' : s.step;
+  const paso = s.step === 'topic' && borrador ? 'crear' : s.step;
   const [sub, tit] = TITULOS[paso];
   const idx = PASOS.indexOf(s.step);
   const dots = [0, 1, 2].map((i) =>
     '<i class="' + (i <= idx ? 'on' : '') + (i === Math.min(idx, 2) ? ' now' : '') + '"></i>').join('');
   const conSec = s.step === 'question' || s.step === 'stats' || paso === 'crear';
+  const ultima = borrador && borrador.i >= borrador.n - 1;
   const prim = s.step === 'reveal'
     ? (s.qNum >= s.total ? 'Ver resultados' : 'Siguiente pregunta')
-    : PRINCIPAL[paso];
+    : ultima ? 'Guardar cuestionario' : PRINCIPAL[paso];
   return '<div class="host">' +
     '<header>' +
       '<button class="back" id="atras" aria-label="Atrás">←</button>' +
@@ -322,10 +327,10 @@ function armazon(s) {
     '</header>' +
     '<main id="root">' + contenido(s) + '</main>' +
     '<footer><div class="row">' +
-      (conSec ? '<button class="btn ghost" id="' + (paso === 'crear' ? 'cancelar' : 'sec') + '">' +
-        (paso === 'crear' ? 'Cancelar' : s.step === 'stats' ? 'Inicio' : 'Saltar') + '</button>' : '') +
-      '<button class="btn primary' + (s.step === 'lobby' ? ' go' : '') + '" id="' + (paso === 'crear' ? 'guardar' : 'prim') + '"' +
-        (s.step === 'topic' && !creando && !s.topics.length ? ' disabled' : '') + '>' + esc(prim) + '</button>' +
+      (conSec ? '<button class="btn ghost" id="sec">' +
+        (paso === 'crear' ? (borrador.i > 0 ? 'Anterior' : 'Cancelar') : s.step === 'stats' ? 'Inicio' : 'Saltar') + '</button>' : '') +
+      '<button class="btn primary' + (s.step === 'lobby' ? ' go' : '') + '" id="prim"' +
+        (s.step === 'topic' && !borrador && !s.topic ? ' disabled' : '') + '>' + esc(prim) + '</button>' +
     '</div><div class="dots">' + dots + '</div></footer>' +
   '</div>';
 }
@@ -333,7 +338,7 @@ function armazon(s) {
 // La llave decide cuándo se reconstruye. Lo que cambia seguido (respuestas que
 // entran) se actualiza en su lugar, para no reiniciar las animaciones.
 function clave(s) {
-  if (s.step === 'topic') return creando ? 'crear' : 'topic|' + s.topic + '|' + s.topics.length;
+  if (s.step === 'topic') return borrador ? 'crear|' + borrador.i : 'topic|' + s.topic + '|' + s.total;
   if (s.step === 'lobby') return 'lobby|' + s.joined + '|' + s.connected;
   if (s.step === 'question') return 'question|' + s.qNum;
   if (s.step === 'reveal') return 'reveal|' + s.qNum + '|' + (s.alert ? 1 : 0) + '|' + s.voice + '|' + (s.texts ? s.texts.length : 0);
@@ -372,7 +377,7 @@ function tick() {
   const ring = $('#ring');
   setText('#t', left);
   if (ring) {
-    ring.style.background = ringStyle(st.deadline, QUESTION_MS, left <= 5);
+    ring.style.background = ringStyle(st.deadline, st.qMs || 20000, left <= 5);
     ring.classList.toggle('low', left <= 5);
   }
 }
@@ -381,34 +386,48 @@ function tick() {
 app.addEventListener('click', (e) => {
   const el = e.target.closest('button');
   if (!el || !st) return;
-  if (el.dataset.t) return void post('/api/host/tema', { id: el.dataset.t });
   const acciones = {
-    atras: () => (creando ? acciones.cancelar() : post('/api/host/atras')),
-    prim: () => post('/api/host/avanzar'),
-    sec: () => post('/api/host/secundario'),
+    atras: () => (borrador ? acciones.sec() : post('/api/host/atras')),
+    prim: () => (borrador ? siguiente(el) : post('/api/host/avanzar')),
+    sec: () => (borrador ? anterior() : post('/api/host/secundario')),
     voz: () => post('/api/host/voz', { voice: st.voice === 'es' ? 'quc' : 'es' }),
     explicar: () => post('/api/host/explicar', { lang: st.voice }),
     saltarVoz: () => post('/api/host/saltar-voz'),
     subir: () => $('#archivo').click(),
-    crear: () => { creando = true; impMsg = ''; render(st); },
-    cancelar: () => { creando = false; impMsg = ''; render(st); },
-    masPregunta: () => {
-      const lista = $('#preguntas');
-      lista.insertAdjacentHTML('beforeend', filaPregunta(lista.children.length + 1));
-      lista.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    },
-    guardar: async () => {
-      el.disabled = true;
-      const r = await post('/api/host/crear', leerCuestionario());
-      el.disabled = false;
-      if (r.ok) { creando = false; impMsg = mensajeImport(r); return render(st); }
-      impMsg = mensajeImport(r);
-      const imp = $('#impRes');
-      if (imp) { imp.innerHTML = impMsg; imp.scrollIntoView({ behavior: 'smooth' }); }
-    },
+    crear: () => { borrador = { tema: '', n: 10, i: -1, preguntas: [] }; impMsg = ''; render(st); },
   };
   if (acciones[el.id]) acciones[el.id]();
 });
+
+// Pasos del asistente de creación.
+function siguiente(btn) {
+  if (borrador.i < 0) {
+    borrador.tema = $('#tema').value;
+    borrador.n = Math.max(1, Math.min(50, Number($('#cantidad').value) || 1));
+    borrador.i = 0;
+    return render(st);
+  }
+  leerPregunta();
+  if (borrador.i < borrador.n - 1) { borrador.i += 1; return render(st); }
+  guardar(btn);
+}
+
+function anterior() {
+  if (borrador.i < 0) { borrador = null; impMsg = ''; return render(st); }   // cancelar
+  leerPregunta();
+  borrador.i -= 1;
+  render(st);
+}
+
+async function guardar(btn) {
+  btn.disabled = true;
+  const r = await post('/api/host/crear', { tema: borrador.tema, preguntas: borrador.preguntas.slice(0, borrador.n) });
+  btn.disabled = false;
+  impMsg = mensajeImport(r);
+  if (r.ok) { borrador = null; return render(st); }
+  const imp = $('#impRes');
+  if (imp) { imp.innerHTML = impMsg; imp.scrollIntoView({ behavior: 'smooth' }); }
+}
 
 app.addEventListener('change', async (e) => {
   if (e.target.id !== 'archivo') return;
@@ -429,8 +448,9 @@ function mensajeImport(r) {
   const errores = (d.errors || []).length
     ? '<p style="margin:8px 0 0">' + d.errors.slice(0, 5).map(esc).join('<br>') + '</p>'
     : '';
+  if (r.ok && !errores) return '';
   return r.ok
-    ? '<div class="alert warn" style="margin-top:12px"><h3>Listo: ' + d.ok + ' preguntas en «' + esc((d.temas || [])[0] || '') + '»</h3>' + errores + '</div>'
+    ? '<div class="alert warn" style="margin-top:12px"><h3>Guardado, con avisos</h3>' + errores + '</div>'
     : '<div class="alert bad" style="margin-top:12px"><h3>No pude guardar</h3>' + errores + '</div>';
 }
 

@@ -8,7 +8,7 @@ import { Room } from './lib/room.js';
 const banks = [{
   id: 'sumas', label: 'Sumas', cat: 'General', grade: 'todos', glyph: 'S', order: 1000,
   questions: [
-    { text: '24 + 18', opts: { A: '42', B: '32', C: '41', D: '46' }, correct: 'A', dist: 'B', why: 'Se lleva 1.', err: 'olvidaron llevar la decena.' },
+    { text: '24 + 18', seconds: 45, opts: { A: '42', B: '32', C: '41', D: '46' }, correct: 'A', dist: 'B', why: 'Se lleva 1.', err: 'olvidaron llevar la decena.' },
     { text: '3 + 3', opts: { A: '5', B: '6', C: '7' }, correct: 'B' },
     { text: '1 + 1', opts: { A: '2', B: '3' }, correct: 'A' },
   ],
@@ -33,7 +33,8 @@ try {
   jugar(room);
   assert.equal(room.step, 'question', 'dos avances llegan a la primera pregunta');
   assert.equal(room.current().text, '24 + 18', 'en el orden en que la maestra las escribió');
-  assert.ok(room.deadline > Date.now(), 'la pregunta trae fecha límite');
+  assert.ok(room.deadline > Date.now() + 40_000, 'la fecha límite respeta los 45 s de la pregunta');
+  assert.equal(room.hostView().qMs, 45_000, 'y los celulares reciben cuánto dura');
 
   // --- LA PRUEBA QUE IMPORTA: la respuesta correcta no viaja antes de tiempo ---
   const vAlumno = room.studentView(a.id);
@@ -163,7 +164,7 @@ try {
   room = new Room({ banks: [] });
   room.advance();
   assert.equal(room.step, 'topic', 'sin cuestionario, Continuar no hace nada');
-  assert.equal(room.hostView().topics.length, 0);
+  assert.equal(room.hostView().topic, null, 'y no hay cuestionario cargado');
 
   console.log('OK — todos los chequeos pasaron');
 } finally {

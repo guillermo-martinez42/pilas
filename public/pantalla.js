@@ -16,22 +16,20 @@ const join = (s) =>
     '</div>' +
   '</div>';
 
-const hint = '<div class="hint">Si tu celular dice que esta red no tiene internet, elegí «Mantener conexión».</div>';
-
 function skeleton(s) {
   if (s.step === 'topic') {
     return '<div class="pane stepIn">' +
-      '<div class="logo" style="width:96px;height:96px;border-radius:30px;font-size:46px">T</div>' +
-      '<h1 class="title">TutorBox está listo</h1>' +
+      '<div class="logo" style="width:96px;height:96px;border-radius:30px;font-size:46px">P</div>' +
+      '<h1 class="title">Pilas está listo</h1>' +
       '<div class="light">Esperando a que la maestra inicie el juego</div>' +
-      join(s) + '</div>' + hint;
+      join(s) + '</div>';
   }
   if (s.step === 'lobby') {
     return '<div class="pane stepIn">' +
       '<div class="muted">CÓDIGO DE SALA</div>' +
       '<p class="code">' + esc(s.code) + '</p>' +
       '<div class="light"><b id="n">0</b> alumnos listos</div>' +
-      join(s) + '</div>' + hint;
+      join(s) + '</div>';
   }
   if (s.step === 'question') {
     const opts = s.q?.open
@@ -87,8 +85,8 @@ function speak(s) {
   lastVoice = vp.n;
   const file = s.audio?.[vp.lang];
   if (file) { new Audio('/audio/' + file).play().catch(() => {}); return; }
-  // Sin archivo: el español lo puede leer la voz del sistema (funciona sin
-  // internet). El k'iche' no tiene voz sintética en ningún sistema.
+  // Sin archivo: el español lo puede leer la voz del sistema.
+  // El k'iche' no tiene voz sintética en ningún sistema.
   if (vp.lang === 'es' && 'speechSynthesis' in window && s.why) {
     const u = new SpeechSynthesisUtterance(s.why);
     u.lang = 'es-ES';

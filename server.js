@@ -1,5 +1,4 @@
-// TutorBox — un solo servidor para las tres pantallas.
-// No depende de ningún servicio externo: corre igual con y sin internet.
+// Pilas — un solo servidor para las tres pantallas.
 import express from 'express';
 import QRCode from 'qrcode';
 import { networkInterfaces } from 'node:os';
@@ -16,11 +15,11 @@ import {
 const HERE = dirname(fileURLToPath(import.meta.url));
 const BANKS_DIR = join(HERE, 'banks');
 const PORT = Number(process.env.PORT) || 80;
-// En internet (Render, VPS, túnel): la dirección pública que escanean los alumnos,
-// no la IP de la LAN. Sin esta variable, todo sigue igual que en el aula.
-const PUBLIC_URL = (process.env.PUBLIC_URL ?? '').replace(/\/$/, '');
+// La dirección pública que escanean los alumnos. PUBLIC_URL= (vacía) usa la IP
+// de la LAN, para probar en local.
+const PUBLIC_URL = (process.env.PUBLIC_URL ?? 'https://pilas-9t85.onrender.com').replace(/\/$/, '');
 
-const db = openDb(join(HERE, 'data', 'tutorbox.db'));
+const db = openDb(join(HERE, 'data', 'pilas.db'));
 // Disco efímero (Render): el PIN se siembra desde el entorno. Si no, tras cada
 // reinicio el primero que abra /maestra se vuelve la maestra.
 const seedPin = process.env.TEACHER_PIN ?? '';
@@ -69,7 +68,7 @@ async function refreshUrl(port) {
 }
 
 // ---- SSE ---------------------------------------------------------------
-// EventSource se reconecta solo cuando el wifi del aula parpadea. Por eso
+// EventSource se reconecta solo cuando la red parpadea. Por eso
 // preferimos SSE a WebSocket: menos piezas y más aguante.
 
 const clients = new Set();
@@ -288,7 +287,7 @@ app.get('/api/host/reporte.csv', (_req, res) => {
 
   const stamp = (g.started_at ?? new Date().toISOString()).slice(0, 10);
   res.type('text/csv; charset=utf-8')
-    .set('Content-Disposition', 'attachment; filename="tutorbox-' + stamp + '.csv"')
+    .set('Content-Disposition', 'attachment; filename="pilas-' + stamp + '.csv"')
     .send('\uFEFF' + lines.join('\r\n') + '\r\n');
 });
 
@@ -306,7 +305,7 @@ app.get('/api/host/respuestas.csv', (_req, res) => {
 
   const stamp = (g.started_at ?? new Date().toISOString()).slice(0, 10);
   res.type('text/csv; charset=utf-8')
-    .set('Content-Disposition', 'attachment; filename="tutorbox-respuestas-' + stamp + '.csv"')
+    .set('Content-Disposition', 'attachment; filename="pilas-respuestas-' + stamp + '.csv"')
     .send('\uFEFF' + lines.join('\r\n') + '\r\n');
 });
 
@@ -324,7 +323,7 @@ function listen(port, canFallback) {
     await refreshUrl(port);
     const line = '='.repeat(52);
     console.log('\n' + line);
-    console.log('  TutorBox listo — no necesita internet');
+    console.log('  Pilas listo');
     console.log('  Alumnos:  ' + joinUrl);
     console.log('  Maestra:  ' + joinUrl + '/maestra');
     console.log('  Pantalla: ' + joinUrl + '/pantalla');

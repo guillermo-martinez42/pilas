@@ -14,7 +14,7 @@ let picked = null;      // eco local para que el toque se sienta inmediato
 function formEntrar(code, error) {
   root.innerHTML =
     '<div class="center left stepIn">' +
-      '<div class="logo">T</div>' +
+      '<div class="logo">P</div>' +
       '<div><h1 class="big">¿Cómo te llamas?</h1>' +
       '<p class="lead" style="max-width:none">Escribí tu nombre para entrar al juego de tu maestra.</p></div>' +
       (code ? '' : '<input class="field code" id="code" inputmode="numeric" maxlength="4" placeholder="Código" aria-label="Código de sala">') +

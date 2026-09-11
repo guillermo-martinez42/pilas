@@ -6,3 +6,4 @@ public/audio/*.ogg
 *.log
 *.torrent
 banks/
+.template-tests/

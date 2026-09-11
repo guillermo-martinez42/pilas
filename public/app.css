@@ -1,6 +1,6 @@
 @import url('./fonts/fonts.css');
 
-/* Tokens sacados del diseño TutorBox Quiz Host. */
+/* Tokens sacados del diseño Pilas Quiz Host. */
 :root {
   --bg: #EEF4F7;
   --surface: #F7FBFD;
@@ -324,7 +324,6 @@ input { font: inherit; }
 .scr .podium { display: flex; align-items: flex-end; gap: 1.4vw; }
 .scr .podium .col { display: flex; flex-direction: column; align-items: center; gap: 1vh; }
 .scr .podium .bar { width: clamp(90px, 11vw, 170px); border-radius: 20px 20px 0 0; display: grid; place-items: center; font-size: clamp(24px, 3vw, 48px); font-weight: 700; }
-.scr .hint { position: absolute; bottom: 2vh; left: 0; right: 0; text-align: center; font-size: clamp(12px, 1.2vw, 18px); color: rgba(159,198,216,.65); }
 
 /* Sobre los fondos de color el punto verde de "conectado" desaparece. */
 .stu.win .dot, .stu.lose .dot, .stu.over .dot { background: #fff; }

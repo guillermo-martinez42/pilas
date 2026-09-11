@@ -25,7 +25,7 @@ function pantallaPin({ crear, error, bloqueo }) {
   app.className = 'stu';
   app.innerHTML =
     '<main id="root"><div class="center left stepIn" style="padding:0 20px">' +
-      '<div class="logo">T</div>' +
+      '<div class="logo">P</div>' +
       '<div><h1 class="big">' + (crear ? 'Creá tu PIN' : 'Hola, maestra') + '</h1>' +
       '<p class="lead" style="max-width:none">' +
         (crear
@@ -56,7 +56,7 @@ function pantallaPin({ crear, error, bloqueo }) {
     const d = r.data || {};
     if (d.error === 'bloqueado') return pantallaPin({ crear, error: 'Demasiados intentos.', bloqueo: d.segundos });
     if (d.error === 'formato') return pantallaPin({ crear, error: 'El PIN son 6 números.' });
-    if (d.error === 'ya-existe') return pantallaPin({ crear: false, error: 'Ya hay un PIN en este TutorBox.' });
+    if (d.error === 'ya-existe') return pantallaPin({ crear: false, error: 'Ya hay un PIN en este Pilas.' });
     pantallaPin({ crear, error: 'Ese PIN no es. ' + (d.segundos ? 'Cuidado: se bloquea a los 5 intentos.' : 'Probá de nuevo.') });
   });
   pin.focus();
@@ -364,7 +364,7 @@ function render(s) {
     if (avi) {
       avi.innerHTML = s.alert
         ? '<div class="alert warn popIn"><h3>' + esc(s.alert.title) + '</h3>' +
-          '<p>Al terminar, TutorBox puede explicar este error por voz.</p></div>'
+          '<p>Al terminar, Pilas puede explicar este error por voz.</p></div>'
         : '';
     }
   }
@@ -462,7 +462,7 @@ function arrancar() {
 
 (async () => {
   const r = await fetch('/api/auth/estado').then((x) => x.json()).catch(() => null);
-  if (!r) return pantallaPin({ crear: false, error: 'No hay conexión con el TutorBox.' });
+  if (!r) return pantallaPin({ crear: false, error: 'No hay conexión con Pilas.' });
   if (r.isHost) return arrancar();
   pantallaPin({ crear: !r.hasPin });
 })();

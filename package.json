@@ -1,9 +1,9 @@
 {
-  "name": "tutorbox",
+  "name": "pilas",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Cuestionarios en el aula, sin internet.",
+  "description": "Cuestionarios en vivo para el aula.",
   "scripts": {
     "start": "node --disable-warning=ExperimentalWarning server.js",
     "test": "node --disable-warning=ExperimentalWarning test-room.js && node test-csv.js",

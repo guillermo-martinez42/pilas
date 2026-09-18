@@ -166,6 +166,13 @@ try {
   assert.equal(room.step, 'topic', 'sin cuestionario, Continuar no hace nada');
   assert.equal(room.hostView().topic, null, 'y no hay cuestionario cargado');
 
+  // --- editar: en el paso 1 las preguntas van con la correcta primero ---
+  room = nuevo();
+  const qs = room.hostView().questions;
+  assert.deepEqual(qs[1], { seconds: 20, text: '3 + 3', answers: ['6', '5', '7'] }, 'la correcta primero, las demás en orden');
+  jugar(room);
+  assert.equal(room.hostView().questions, undefined, 'fuera del paso 1 no viajan');
+
   console.log('OK — todos los chequeos pasaron');
 } finally {
   room.stopTimer();

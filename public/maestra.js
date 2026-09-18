@@ -111,7 +111,8 @@ function pasoTema(s) {
   const cargado = s.topic
     ? '<div class="note"><div style="font-size:13px;color:var(--muted-2);font-weight:600;letter-spacing:.3px">CUESTIONARIO CARGADO</div>' +
       '<div style="font-size:20px;font-weight:600;margin-top:2px">' + esc(s.topicLabel) + '</div>' +
-      '<div style="font-size:15px;color:var(--muted)">' + s.total + ' preguntas · se juegan todas, en orden</div></div>'
+      '<div style="font-size:15px;color:var(--muted)">' + s.total + ' preguntas · se juegan todas, en orden</div>' +
+      '<button class="btn ghost" id="editar" style="margin-top:12px;width:100%">Editar las preguntas</button></div>'
     : '';
   return '<div class="stack stepIn">' +
     '<h1 class="h1">¿Con qué preguntas<br>jugamos hoy?</h1>' +
@@ -395,6 +396,9 @@ app.addEventListener('click', (e) => {
     saltarVoz: () => post('/api/host/saltar-voz'),
     subir: () => $('#archivo').click(),
     crear: () => { borrador = { tema: '', n: 10, i: -1, preguntas: [] }; impMsg = ''; render(st); },
+    // Mismo asistente que "crear", cargado con lo que ya está guardado. Al
+    // guardar se pisa el cuestionario (mismo nombre = mismo archivo).
+    editar: () => { borrador = { tema: st.topicLabel, n: st.questions.length, i: -1, preguntas: st.questions }; impMsg = ''; render(st); },
   };
   if (acciones[el.id]) acciones[el.id]();
 });
